@@ -97,11 +97,23 @@ def fig_diagnostic(
     task_name: str = ""
 ):  
     acceptance_rate = extract_diagnostic(df.query("algorithm == 'tsnpe'"), "acceptance rate")
-    acceptance_rate[:, :, 1:] = np.power(10, acceptance_rate[:, :, 1:])
+    for i in range(3):
+        acceptance_rate[i][:, 1:] = np.power(10, acceptance_rate[i][:, 1:])
     gt_in_support = extract_diagnostic(df.query("algorithm == 'tsnpe'"))
 
-    av_acceptance_rate = np.mean(acceptance_rate, axis=1)
-    av_gt_in_support = np.mean(gt_in_support, axis=1)
+    av_acceptance_rates = []
+    for i in range(3):
+        av_acceptance_rate = np.mean(acceptance_rate[i], axis=0)
+        av_acceptance_rates.append(av_acceptance_rate)
+    av_acceptance_rate = np.asarray(av_acceptance_rates)
+
+    av_gt_in_supports = []
+    for i in range(3):
+        av_gt_in_support = np.mean(gt_in_support[i], axis=0)
+        av_gt_in_supports.append(av_gt_in_support)
+    av_gt_in_support = np.asarray(av_gt_in_supports)
+
+    # av_gt_in_support = np.mean(gt_in_support, axis=1)
 
     fig, ax = plt.subplots(1, 2, figsize=(width, height))
     ax[0].plot(np.arange(1, 11), av_acceptance_rate[0], c="k", alpha=0.3)
